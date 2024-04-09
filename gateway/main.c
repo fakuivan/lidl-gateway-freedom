@@ -52,11 +52,11 @@ int sockatmark(int fd)
 
 static void _set_status_led(bool is_on)
 {
-    int fd = open("/proc/led1", O_WRONLY);
+    int fd = open("/proc/gpio", O_WRONLY);
     if (fd < 0) {
         return;
     }
-    write(fd, (is_on) ? "1\n" : "0\n", 2);
+    write(fd, (is_on) ? "sys_led 1\n" : "sys_led 0\n", 2);
     close(fd);
 }
 
