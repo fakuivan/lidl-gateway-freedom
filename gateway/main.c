@@ -56,7 +56,7 @@ static void _set_status_led(bool is_on)
     if (fd < 0) {
         return;
     }
-    write(fd, (is_on) ? "sys_led 1\n" : "sys_led 0\n", 2);
+    write(fd, (is_on) ? "sys_led 1\n" : "sys_led 0\n", 11);
     close(fd);
 }
 
