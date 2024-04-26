@@ -125,6 +125,7 @@ int main(int argc, char** argv)
     FD_ZERO (&_master_read_set);
     FD_ZERO (&_master_except_set);
     uint16_t port = 8888;
+    bool loopback_only = false;
     _serial_settings.is_hardware_flow_control = true;
     _serial_settings.baud_bps = 115200;
     _serial_settings.device = strdup(DEFAULT_SERIAL_PORT);
@@ -133,7 +134,7 @@ int main(int argc, char** argv)
     signal(SIGPIPE, SIG_IGN);
 
     int c;
-    while ((c = getopt (argc, argv, "fp:d:b:")) != -1) {
+    while ((c = getopt (argc, argv, "flp:d:b:")) != -1) {
         switch(c) {
             case 'f':
                 _serial_settings.is_hardware_flow_control = false;
@@ -145,6 +146,8 @@ int main(int argc, char** argv)
                 free(_serial_settings.device);
                 _serial_settings.device = strdup(optarg);
                 break;
+            case 'l':
+                loopback_only = true;
             case 'b':
                 _serial_settings.baud_bps = atoi(optarg);
                 break;
@@ -155,8 +158,9 @@ int main(int argc, char** argv)
     }
 
     fprintf(stderr, "serialgateway " VERSION
-                    ": port %d, serial=%s, baud=%d, flow=%s\n",
-            port, _serial_settings.device, _serial_settings.baud_bps,
+                    ": listen on %s, port %d, serial=%s, baud=%d, flow=%s\n",
+            loopback_only ? "localhost" : "any address", port,
+            _serial_settings.device, _serial_settings.baud_bps,
             (_serial_settings.is_hardware_flow_control)?"HW":"sw");
 
     _open_serial_port();
@@ -177,7 +181,7 @@ int main(int argc, char** argv)
 
     name.sin_family = AF_INET;
     name.sin_port = htons (port);
-    name.sin_addr.s_addr = htonl (INADDR_ANY);
+    name.sin_addr.s_addr = htonl (loopback_only ? INADDR_LOOPBACK : INADDR_ANY);
     if (bind (listen_sock, (struct sockaddr *) &name, sizeof (name)) < 0) {
         _error_exit("bind");
     }
