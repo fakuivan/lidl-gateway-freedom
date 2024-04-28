@@ -148,6 +148,7 @@ int main(int argc, char** argv)
                 break;
             case 'l':
                 loopback_only = true;
+                break;
             case 'b':
                 _serial_settings.baud_bps = atoi(optarg);
                 break;
